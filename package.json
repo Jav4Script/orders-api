@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/server.ts",
+    "dev": "nodemon --watch src --exec ts-node src/server.ts",
     "build": "tsc",
     "test": "jest",
     "test:coverage": "jest --coverage"

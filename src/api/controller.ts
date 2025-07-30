@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { parseAndNormalize } from '../services/parser';
-import { saveParsedData, findOrdersByFilter } from '../services/database';
+import { saveParsedData } from '../services/database';
+import { getFormattedOrders } from '../application/orderService';
 
 export const uploadFile = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -31,27 +32,9 @@ export const getOrders = async (req: Request, res: Response, next: NextFunction)
       sortOrder: sortOrder as 'asc' | 'desc' | undefined,
     };
 
-    const flatOrders = await findOrdersByFilter(filters);
+    const finalResponse = await getFormattedOrders(filters);
 
-    // Re-group flat data into nested structure
-    const usersMap = new Map();
-    for (const row of flatOrders) {
-      let user = usersMap.get(row.user_id);
-      if (!user) {
-        user = { user_id: row.user_id, name: row.name, orders: [] };
-        usersMap.set(row.user_id, user);
-      }
-
-      let order = user.orders.find((o: any) => o.order_id === row.order_id);
-      if (!order) {
-        order = { order_id: row.order_id, total: row.total, date: row.date, products: [] };
-        user.orders.push(order);
-      }
-
-      order.products.push({ product_id: row.product_id, value: row.value.toFixed(2) });
-    }
-
-    res.status(200).json(Array.from(usersMap.values()));
+    res.status(200).json(finalResponse);
   } catch (error) {
     next(error);
   }
