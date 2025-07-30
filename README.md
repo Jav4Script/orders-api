@@ -17,9 +17,9 @@ O projeto consiste em uma API REST que recebe um arquivo de texto com dados de p
 
 ## Justificativa das Escolhas Técnicas
 
-Ao longo do desenvolvimento, priorizamos a **simplicidade** e a **lógica** como pilares, conforme destacado no desafio. As escolhas de ferramentas foram feitas para agregar valor sem introduzir complexidade desnecessária ou desviar o foco da lógica de negócio.
+Ao longo do desenvolvimento, a **simplicidade** e a **lógica** foram priorizadas como pilares, conforme destacado no desafio. As escolhas de ferramentas foram feitas para agregar valor sem introduzir complexidade desnecessária ou desviar o foco da lógica de negócio.
 
-- **Express.js:** Escolhido por ser um framework web minimalista e flexível. Ele nos permite construir a API de forma eficiente, sem impor uma arquitetura rígida, mantendo o controle sobre o código da aplicação.
+- **Express.js:** Escolhido por ser um framework web minimalista e flexível. Ele permite construir a API de forma eficiente, sem impor uma arquitetura rígida, mantendo o controle sobre o código da aplicação.
 
 - **SQLite:** Para a persistência de dados, o SQLite foi a escolha ideal. Ele oferece um banco de dados relacional completo em um único arquivo, eliminando a necessidade de configurar e gerenciar um servidor de banco de dados externo (como PostgreSQL ou MySQL) ou Docker. Isso simplifica drasticamente o setup do ambiente de desenvolvimento e a execução da aplicação, alinhando-se perfeitamente com o requisito de simplicidade.
 
@@ -34,7 +34,7 @@ Ao longo do desenvolvimento, priorizamos a **simplicidade** e a **lógica** como
 
 | Componente/Funcionalidade | Tecnologia Escolhida | Justificativa da Escolha | Opções Alternativas | Por que a Alternativa Não Foi Escolhida (para este projeto) |
 | :------------------------ | :------------------- | :----------------------- | :------------------ | :---------------------------------------------------------- |
-| **Framework Web**         | Express.js           | Minimalista, flexível, amplamente adotado, permite foco na lógica central. | NestJS, módulo `http` nativo do Node.js | NestJS: Excesso para a simplicidade, mais opinativo. `http` nativo: Muito verboso, adiciona complexidade desnecessária para funcionalidades básicas de API. |
+| **Framework Web**         | Express.js           | Minimalista, flexível, amplamente adotado, permite focar na lógica central. | NestJS, módulo `http` nativo do Node.js | NestJS: Excesso para a simplicidade, mais opinativo. `http` nativo: Muito verboso, adiciona complexidade desnecessária para funcionalidades básicas de API. |
 | **Persistência de Dados** | SQLite               | Simples, baseado em arquivo, não requer servidor externo, alinha-se com a simplicidade. | PostgreSQL, MySQL, MongoDB, Em memória (original) | DBs Externos: Adicionam complexidade de setup/gerenciamento (Docker/instalação). Em memória: Perda de dados ao reiniciar, não persistente. |
 | **Validação de Entrada**  | Zod                  | Declarativo, com tipagem forte, separa a lógica de validação, melhora a robustez. | Validação manual, Joi, Yup | Manual: Verboso, propenso a erros, mistura responsabilidades. Outras libs: Similares ao Zod, mas Zod oferece excelente integração com TypeScript. |
 | **Logging**               | Winston              | Logging estruturado, flexível, melhora a observabilidade. | `console.log` | `console.log`: Falta estrutura, difícil de filtrar/analisar em produção. |
