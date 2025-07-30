@@ -52,6 +52,7 @@ sequenceDiagram
     participant ValidationMiddleware as Middleware de Validação
     participant Controller
     participant ParserService as Serviço de Parsing
+    participant OrderService as Serviço de Pedidos
     participant DatabaseService as Serviço de Banco de Dados (SQLite)
 
     Cliente->>+API_Gateway: POST /api/import com arquivo .txt
@@ -66,8 +67,10 @@ sequenceDiagram
     Cliente->>+API_Gateway: GET /api/orders?orderId=123
     API_Gateway->>+ValidationMiddleware: Valida query params
     ValidationMiddleware->>+Controller: getOrders(req, res)
-    Controller->>+DatabaseService: findOrdersByFilter(filters)
-    DatabaseService-->>-Controller: Retorna dados planos
+    Controller->>+OrderService: getFormattedOrders(filters)
+    OrderService->>+DatabaseService: findOrdersByFilter(filters)
+    DatabaseService-->>+OrderService: Retorna dados planos
+    OrderService-->>-Controller: Retorna dados formatados
     Controller-->>-API_Gateway: Retorna dados JSON
     API_Gateway-->>-Cliente: Resposta 200 OK com JSON
 ```
@@ -98,6 +101,43 @@ graph TD
     C --> A
 ```
 
+## Estrutura de Diretórios
+
+Abaixo está a estrutura de diretórios do projeto, com uma breve descrição de cada um:
+
+```
+.
+├───src/
+│   ├───server.ts             # Ponto de entrada da aplicação, configura o servidor Express.
+│   ├───api/                  # Contém a lógica da API REST.
+│   │   ├───controller.ts     # Lógica de negócio para manipular requisições e respostas.
+│   │   ├───routes.ts         # Define as rotas da API e associa aos controladores.
+│   │   ├───middlewares/      # Middlewares para processamento de requisições (ex: validação, tratamento de erros).
+│   │   │   ├───error.middleware.ts   # Middleware para tratamento centralizado de erros.
+│   │   │   └───validate.middleware.ts # Middleware para validação de schemas de requisição.
+│   │   └───schemas/          # Definições de schemas de validação (usando Zod).
+│   │       └───order.schema.ts       # Schema para validação de dados de pedidos.
+│   ├───application/          # Contém a lógica de negócio principal e serviços de aplicação.
+│   │   └───orderService.ts   # Serviço responsável pela manipulação e formatação de dados de pedidos.
+│   ├───config/               # Arquivos de configuração da aplicação.
+│   │   └───logger.ts         # Configuração do logger (Winston).
+│   └───services/             # Serviços de infraestrutura e utilitários.
+│       ├───database.ts       # Serviço para interação com o banco de dados (SQLite).
+│       └───parser.ts         # Serviço para parsing e normalização de arquivos de entrada.
+├───tests/                    # Contém os testes unitários e de integração.
+│   ├───api.spec.ts           # Testes para os endpoints da API.
+│   └───parser.spec.ts        # Testes para o serviço de parsing.
+├───data/                     # Exemplos de arquivos de entrada para importação.
+├───docs/                     # Documentação adicional e ativos (imagens).
+│   └───assets/               # Imagens usadas na documentação.
+├───jest.config.js            # Configuração do Jest para testes.
+├───package.json              # Metadados do projeto e dependências.
+├───package-lock.json         # Bloqueio de versões das dependências.
+├───tsconfig.json             # Configuração do TypeScript.
+├───.gitignore                # Arquivo para ignorar arquivos e diretórios no Git.
+└───README.md                 # Este arquivo de documentação do projeto.
+```
+
 ## Como Executar
 
 1.  **Instale as dependências:**
@@ -124,6 +164,16 @@ Para gerar um relatório de cobertura de testes, execute:
 ```bash
 npm run test:coverage
 ```
+
+## Comandos Disponíveis
+
+Para facilitar o desenvolvimento e a execução do projeto, os seguintes comandos estão disponíveis via `npm`:
+
+-   **`npm start`**: Inicia o servidor da aplicação em modo de produção.
+-   **`npm dev`**: Inicia o servidor em modo de desenvolvimento com `nodemon`, que monitora alterações nos arquivos `src` e reinicia o servidor automaticamente.
+-   **`npm build`**: Compila o código TypeScript para JavaScript, gerando os arquivos de saída na pasta `dist`.
+-   **`npm test`**: Executa todos os testes unitários e de integração definidos no projeto.
+-   **`npm test:coverage`**: Executa os testes e gera um relatório de cobertura de código, mostrando a porcentagem de código coberto pelos testes.
 
 ## Endpoints da API
 
