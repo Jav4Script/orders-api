@@ -1,6 +1,6 @@
 # Desafio Técnico - Vertical Logística
 
-Esta é uma solução para o desafio técnico da Vertical Logística da LuizaLabs.
+Esta é uma solução para o desafio técnico da Vertical Logistica da LuizaLabs.
 
 O projeto consiste em uma API REST que recebe um arquivo de texto com dados de pedidos, normaliza esses dados e os expõe em formato JSON, com funcionalidades de filtro.
 
@@ -81,11 +81,18 @@ graph TD
     end
 
     subgraph "Aplicação"
-        A[Servidor Express] --> B{Rotas da API}
-        B --> VM[Middleware de Validação]
-        VM --> C1[Controller de Pedidos]
-        C1 --> D[Serviço de Parsing]
-        C1 --> DB[Serviço de Banco de Dados (SQLite)]
+        A[Servidor Express]
+        B[Rotas da API]
+        VM[Middleware de Validação]
+        C1[Controller de Pedidos]
+        D[Serviço de Parsing]
+        DB[Serviço de Banco de Dados - SQLite]
+
+        A --> B
+        B --> VM
+        VM --> C1
+        C1 --> D
+        C1 --> DB
     end
 
     C --> A
