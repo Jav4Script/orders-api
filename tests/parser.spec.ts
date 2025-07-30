@@ -18,11 +18,11 @@ describe('Parser Service', () => {
             products: [
               {
                 product_id: 4,
-                value: '895.87'
+                value: 895.87
               },
               {
                 product_id: 2,
-                value: '873.12'
+                value: 873.12
               }
             ]
           }

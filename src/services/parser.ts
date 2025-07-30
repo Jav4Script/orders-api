@@ -1,7 +1,7 @@
 
 export interface Product {
   product_id: number;
-  value: string;
+  value: number;
 }
 
 export interface Order {
@@ -45,10 +45,10 @@ export const parseAndNormalize = (fileContent: string): User[] => {
 
     order.products.push({
       product_id: productId,
-      value: productValue.toFixed(2),
+      value: productValue,
     });
 
-    order.total = parseFloat((order.total + productValue).toFixed(2));
+    order.total = order.total + productValue;
   }
 
   return Array.from(usersMap.values());
