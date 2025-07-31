@@ -24,9 +24,18 @@ export const getFormattedOrders = async (filters: any) => {
       continue; // Skip this product if it doesn't match the filter
     }
 
-    const productValue = parseFloat(row.value);
-    order.products.push({ product_id: row.product_id, value: productValue.toFixed(2) });
-    order.total += productValue;
+    // Ensure product_id is a valid number after retrieval from database
+    const parsedProductId = (row.product_id === null || isNaN(row.product_id)) ? -1 : row.product_id;
+
+    // Ensure productValue is a valid number after retrieval from database
+    let parsedProductValue = parseFloat(row.value);
+    if (isNaN(parsedProductValue)) {
+        console.warn(`Invalid product value retrieved from DB, replacing with 0: ${row.value}`);
+        parsedProductValue = 0;
+    }
+
+    order.products.push({ product_id: parsedProductId, value: parsedProductValue.toFixed(2) });
+    order.total += parsedProductValue;
   }
 
   // Filter out orders that ended up with no products after filtering
@@ -34,7 +43,8 @@ export const getFormattedOrders = async (filters: any) => {
     ...user,
     orders: user.orders.filter((order: any) => order.products.length > 0).map((order: any) => ({
       ...order,
-      total: order.total.toFixed(2),
+      // Ensure total is not NaN before toFixed, replace with "0.00" if it is
+      total: isNaN(order.total) ? "0.00" : order.total.toFixed(2),
     })),
   })).filter((user: any) => user.orders.length > 0); // Filter out users with no orders
 };
