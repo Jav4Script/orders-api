@@ -4,6 +4,23 @@ Esta é uma solução para o desafio técnico da Vertical Logistica da LuizaLabs
 
 O projeto consiste em uma API REST que recebe um arquivo de texto com dados de pedidos, normaliza esses dados e os expõe em formato JSON, com funcionalidades de filtro.
 
+Para uma análise mais aprofundada sobre as decisões e considerações técnicas, consulte o arquivo [ANALYSIS.md](ANALYSIS.md).
+
+## Sumário
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Justificativa das Escolhas Técnicas](#justificativa-das-escolhas-técnicas)
+- [Escolhas Técnicas: Alternativas e Justificativas](#escolhas-técnicas-alternativas-e-justificativas)
+- [Arquitetura](#arquitetura)
+  - [Diagrama de Fluxo de Dados](#diagrama-de-fluxo-de-dados)
+  - [Diagrama de Componentes](#diagrama-de-componentes)
+- [Estrutura de Diretórios](#estrutura-de-diretórios)
+- [Como Executar](#como-executar)
+- [Como Testar](#como-testar)
+- [Comandos Disponíveis](#comandos-disponíveis)
+- [Endpoints da API](#endpoints-da-api)
+  - [1. Importar Arquivo](#1-importar-arquivo)
+  - [2. Consultar Pedidos](#2-consultar-pedidos)
+
 ## Tecnologias Utilizadas
 
 - **Node.js:** Ambiente de execução para o servidor.
