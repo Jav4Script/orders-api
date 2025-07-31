@@ -99,7 +99,7 @@ export async function findOrdersByFilter(filters: { orderId?: number; startDate?
     }
 
     if (filters.sortBy) {
-      const orderByColumn = filters.sortBy;
+      const orderByColumn = filters.sortBy === 'order_id' ? 'o.order_id' : filters.sortBy;
       const orderDirection = filters.sortOrder === 'desc' ? 'DESC' : 'ASC';
       query += ` ORDER BY ${orderByColumn} ${orderDirection}`;
     }
