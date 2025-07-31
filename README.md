@@ -126,16 +126,18 @@ Abaixo está a estrutura de diretórios do projeto, com uma breve descrição de
 │       └───parser.ts         # Serviço para parsing e normalização de arquivos de entrada.
 ├───tests/                    # Contém os testes unitários e de integração.
 │   ├───api.spec.ts           # Testes para os endpoints da API.
-│   └───parser.spec.ts        # Testes para o serviço de parsing.
+│   ├───parser.spec.ts        # Testes para o serviço de parsing.
+│   └───orderService.spec.ts  # Testes para o serviço de pedidos (orderService).
 ├───data/                     # Exemplos de arquivos de entrada para importação.
 ├───docs/                     # Documentação adicional e ativos (imagens).
 │   └───assets/               # Imagens usadas na documentação.
+├───.gitignore                # Arquivo para ignorar arquivos e diretórios no Git.
+├───ANALYSIS.md               # Análise e considerações sobre o desafio técnico.
 ├───jest.config.js            # Configuração do Jest para testes.
 ├───package.json              # Metadados do projeto e dependências.
 ├───package-lock.json         # Bloqueio de versões das dependências.
-├───tsconfig.json             # Configuração do TypeScript.
-├───.gitignore                # Arquivo para ignorar arquivos e diretórios no Git.
-└───README.md                 # Este arquivo de documentação do projeto.
+├───README.md                 # Este arquivo de documentação do projeto.
+└───tsconfig.json             # Configuração do TypeScript.
 ```
 
 ## Como Executar
