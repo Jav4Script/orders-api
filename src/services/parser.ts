@@ -23,11 +23,32 @@ export const parseAndNormalize = (fileContent: string): User[] => {
   const usersMap = new Map<number, User>();
 
   for (const line of lines) {
-    const userId = parseInt(line.substring(0, 10), 10);
+    let userId = parseInt(line.substring(0, 10), 10);
+    if (isNaN(userId)) {
+      console.warn(`Invalid userId found, replacing with -1: ${line}`);
+      userId = -1; // Placeholder for invalid userId
+    }
+
     const userName = line.substring(10, 55).trim();
-    const orderId = parseInt(line.substring(55, 65), 10);
-    const productId = parseInt(line.substring(65, 75), 10);
-    const productValue = parseFloat(line.substring(75, 87));
+
+    let orderId = parseInt(line.substring(55, 65), 10);
+    if (isNaN(orderId)) {
+      console.warn(`Invalid orderId found, replacing with -1: ${line}`);
+      orderId = -1; // Placeholder for invalid orderId
+    }
+
+    let productId = parseInt(line.substring(65, 75), 10);
+    if (isNaN(productId)) {
+      console.warn(`Invalid productId found, replacing with -1: ${line}`);
+      productId = -1; // Placeholder for invalid productId
+    }
+
+    let productValue = parseFloat(line.substring(75, 87));
+    if (isNaN(productValue)) {
+      console.warn(`Invalid productValue found, replacing with 0: ${line}`);
+      productValue = 0; // Placeholder for invalid productValue
+    }
+
     const dateStr = line.substring(87, 95);
     const purchaseDate = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
 
