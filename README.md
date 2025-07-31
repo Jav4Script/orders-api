@@ -1,6 +1,6 @@
-# Desafio Técnico - Vertical Logística
+# Desafio Técnico
 
-Esta é uma solução para o desafio técnico da Vertical Logistica da LuizaLabs.
+Esta é uma solução para o desafio técnico proposto.
 
 O projeto consiste em uma API REST que recebe um arquivo de texto com dados de pedidos, normaliza esses dados e os expõe em formato JSON, com funcionalidades de filtro.
 
