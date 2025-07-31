@@ -1,0 +1,59 @@
+### **Reflexões sobre a Implementação do Desafio Técnico - Vertical Logística**
+
+Este documento visa apresentar uma retrospectiva da solução desenvolvida para o desafio técnico da LuizaLabs, detalhando como os requisitos foram abordados e as considerações que guiaram nossas escolhas. Nosso objetivo foi entregar uma solução funcional e alinhada com as premissas do desafio, mantendo a simplicidade como um pilar fundamental.
+
+### **1. Abordagem aos Requisitos Funcionais**
+
+A seguir, detalhamos como cada requisito funcional do desafio foi interpretado e implementado na solução atual:
+
+| Requisito | Abordagem na Solução | Detalhes da Implementação |
+| :--- | :--- | :--- |
+| **Receber arquivo via API REST** | **Implementado.** | O endpoint `POST /api/import` foi criado utilizando Express e Multer, permitindo o recebimento de arquivos no formato `multipart/form-data`. |
+| **Processar arquivo de formato fixo** | **Implementado.** | O `ParserService` foi desenvolvido para ler o conteúdo do arquivo de texto, extraindo os campos com base nos tamanhos e tipos especificados no desafio, garantindo a correta interpretação dos dados brutos. |
+| **Normalizar os dados** | **Implementado.** | A lógica de normalização agrupa os produtos dentro de seus respectivos pedidos e, por sua vez, os pedidos são associados aos seus usuários. Essa estrutura hierárquica em JSON é construída dinamicamente, incluindo o cálculo do valor total de cada pedido. |
+| **Retornar dados via API REST** | **Implementado.** | O endpoint `GET /api/orders` foi projetado para disponibilizar os dados processados em formato JSON, seguindo a estrutura de payload solicitada. |
+| **Filtrar por ID do pedido** | **Implementado.** | A API permite filtrar os resultados da consulta de pedidos através do parâmetro `?orderId=<id>`, facilitando a busca por pedidos específicos. |
+| **Filtrar por intervalo de datas** | **Implementado.** | A funcionalidade de filtro por datas foi adicionada, aceitando os parâmetros `?startDate=<data>` e `?endDate=<data>` para refinar as consultas dentro de um período definido. |
+| **Filtrar por ID do produto** | **Implementado.** | Para oferecer maior granularidade nas consultas, foi incluído o filtro por `?productId=<id>`, permitindo buscar pedidos que contenham um produto específico. |
+| **Ordenar resultados** | **Implementado.** | A API oferece a capacidade de ordenar os resultados da consulta utilizando os parâmetros `?sortBy=<campo>` (por `order_id`, `total` ou `date`) e `?sortOrder=<ordem>` (ascendente ou descendente), proporcionando flexibilidade na apresentação dos dados. |
+
+---
+
+### **2. Considerações sobre Requisitos Não-Funcionais e "Key Words"**
+
+As "Key Words" fornecidas no desafio serviram como um guia essencial para as decisões de design e implementação. Abaixo, refletimos sobre como cada uma delas foi abordada:
+
+| Palavra-chave / Conceito | Abordagem na Solução | Detalhes da Implementação |
+| :--- | :--- | :--- |
+| **Testes** | **Prioridade na Qualidade.** | Foram desenvolvidos testes unitários para a lógica de parsing (`parser.spec.ts`) e testes de integração para os endpoints da API (`api.spec.ts`), utilizando Jest e Supertest. A intenção foi garantir a robustez e a correção das funcionalidades implementadas. |
+| **Lógica** | **Clareza e Separação.** | A lógica de negócio central (parsing e manipulação de dados) foi isolada em serviços dedicados (`ParserService` e `DatabaseService`), promovendo a clareza e a manutenibilidade do código. |
+| **Simplicidade** | **Princípio Orientador.** | A simplicidade foi um fator determinante em todas as escolhas, desde a seleção do framework web até a persistência de dados. Buscamos soluções que resolvessem o problema de forma eficaz sem adicionar complexidade desnecessária. |
+| **SOLID** | **Aplicação Consciente.** | Os princípios SOLID, especialmente o Princípio da Responsabilidade Única (SRP), foram aplicados na estruturação do código, com módulos e componentes tendo responsabilidades bem definidas (e.g., Controller para orquestração HTTP, Service para lógica de negócio). |
+| **Linguagem (não framework)** | **Foco na Essência.** | A ênfase foi dada à implementação da lógica em TypeScript. As bibliotecas e ferramentas utilizadas foram escolhidas por serem complementares à linguagem e não por ditarem a arquitetura de forma excessiva, mantendo o controle sobre o código-fonte. |
+| **Automação (Ex: Build, Coverage)** | **Ferramentas Essenciais.** | Scripts para `build` (compilação TypeScript), `test` (execução de testes) e `test:coverage` (relatório de cobertura) foram configurados no `package.json`, visando automatizar tarefas e garantir a qualidade do código. |
+| **Desenho da API** | **Padrões RESTful.** | A API foi concebida seguindo os princípios REST, com endpoints intuitivos, uso apropriado de métodos HTTP e parâmetros de consulta para filtros e ordenação, buscando uma interface clara e fácil de consumir. |
+| **Git** | **Controle de Versão.** | Um arquivo `.gitignore` foi configurado para gerenciar adequadamente os arquivos versionados, seguindo as boas práticas de controle de versão. |
+| **Documentação** | **Clareza e Abrangência.** | O `README.md` foi elaborado para fornecer instruções claras de uso, diagramas de arquitetura e justificativas para as escolhas técnicas. Este documento (`ANALYSIS.md`) complementa, oferecendo uma reflexão sobre o processo de implementação. |
+
+---
+
+### **3. Oportunidades de Evolução e Próximos Passos (Foco em Produção)**
+
+Durante o desenvolvimento, identifiquei algumas áreas que representam oportunidades para aprimorar a solução, caso o projeto evolua para um cenário de produção. Estas não são inconsistências, mas sim caminhos para tornar a aplicação ainda mais robusta, segura e escalável em um ambiente real:
+
+| ID | Oportunidade de Evolução | Detalhes e Justificativa | Prioridade (para um cenário de produção) |
+| :--- | :--- | :--- | :--- |
+| **E-1** | **Tratamento de Erros Mais Granular** | O middleware de erro atual é eficaz para erros gerais e de validação. No futuro, poderíamos refinar o tratamento para diferentes tipos de exceções (ex: erros de banco de dados, erros de lógica de negócio), retornando mensagens mais detalhadas e códigos de status HTTP mais precisos. | **Média** |
+| **E-2** | **Paginação na Consulta de Pedidos** | Para lidar com grandes volumes de dados de forma eficiente, a implementação de paginação (utilizando parâmetros como `limit` e `offset`) na consulta de pedidos seria um passo natural para otimizar o desempenho da API e a experiência do usuário. | **Média** |
+| **E-3** | **Autenticação e Autorização** | Para proteger a API e controlar o acesso aos dados, a implementação de mecanismos de autenticação (ex: JWT) e autorização (baseada em roles ou permissões) seria fundamental em um ambiente de produção. | **Alta** |
+| **E-4** | **Rate Limiting** | Para prevenir abusos e ataques de negação de serviço (DoS), a adição de um middleware de rate limiting para controlar o número de requisições que um cliente pode fazer em um determinado período é crucial. | **Média** |
+| **E-5** | **CI/CD Pipeline** | A automação do processo de integração contínua e entrega contínua (CI/CD) garantiria que o código seja testado, construído e implantado de forma consistente e eficiente em diferentes ambientes. | **Alta** |
+| **E-6** | **Monitoramento e Alerta** | Para garantir a saúde e o desempenho da aplicação em produção, a integração com ferramentas de monitoramento (ex: Prometheus, Grafana) e sistemas de alerta (ex: PagerDuty) permitiria a detecção proativa de problemas. | **Alta** |
+| **E-7** | **Containerização e Orquestração** | Embora tenhamos optado por SQLite para simplicidade no desafio, em produção, a containerização com Docker e a orquestração com ferramentas como Kubernetes seriam essenciais para escalabilidade, resiliência e gerenciamento de recursos. | **Média** |
+| **E-8** | **Otimização de Performance** | Para cargas de trabalho mais intensas, a otimização de queries SQL, a implementação de caching (ex: Redis) e a revisão de gargalos de performance seriam passos importantes. | **Baixa** |
+
+---
+
+### **Conclusão**
+
+A solução apresentada para o desafio técnico da Vertical Logística reflete um esforço consciente para equilibrar a entrega de funcionalidades completas com a adesão aos princípios de simplicidade e clareza. Entendo que a arquitetura modular, a escolha de tecnologias adequadas ao escopo e a abrangente suíte de testes demonstram uma base sólida para futuras expansões. As oportunidades de evolução mapeadas indicam um caminho claro para adaptar a aplicação a cenários mais complexos e exigentes, mantendo sempre a qualidade e a manutenibilidade como prioridades.
