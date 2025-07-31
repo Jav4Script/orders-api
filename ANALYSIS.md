@@ -1,5 +1,11 @@
 ### **Reflexões sobre a Implementação do Desafio Técnico - Vertical Logística**
 
+## Sumário
+- [1. Abordagem aos Requisitos Funcionais](#1-abordagem-aos-requisitos-funcionais)
+- [2. Considerações sobre Requisitos Não-Funcionais e "Key Words"](#2-considerações-sobre-requisitos-não-funcionais-e-key-words)
+- [3. Oportunidades de Evolução e Próximos Passos (Foco em Produção)](#3-oportunidades-de-evolução-e-próximos-passos-foco-em-produção)
+- [Conclusão](#conclusão)
+
 Neste documento, apresenta-se uma retrospectiva da solução desenvolvida para o desafio técnico da LuizaLabs, detalhando como os requisitos foram abordados e as considerações que guiaram as escolhas. O objetivo foi entregar uma solução funcional e alinhada com as premissas do desafio, mantendo a simplicidade como um pilar fundamental.
 
 ### **1. Abordagem aos Requisitos Funcionais**
