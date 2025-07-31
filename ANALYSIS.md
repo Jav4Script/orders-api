@@ -1,4 +1,4 @@
-### **Reflexões sobre a Implementação do Desafio Técnico - Vertical Logística**
+### **Reflexões sobre a Implementação do Desafio Técnico**
 
 ## Sumário
 - [1. Abordagem aos Requisitos Funcionais](#1-abordagem-aos-requisitos-funcionais)
@@ -6,7 +6,7 @@
 - [3. Oportunidades de Evolução e Próximos Passos (Foco em Produção)](#3-oportunidades-de-evolução-e-próximos-passos-foco-em-produção)
 - [Conclusão](#conclusão)
 
-Neste documento, apresenta-se uma retrospectiva da solução desenvolvida para o desafio técnico da LuizaLabs, detalhando como os requisitos foram abordados e as considerações que guiaram as escolhas. O objetivo foi entregar uma solução funcional e alinhada com as premissas do desafio, mantendo a simplicidade como um pilar fundamental.
+Neste documento, apresenta-se uma retrospectiva da solução desenvolvida para o desafio técnico, detalhando como os requisitos foram abordados e as considerações que guiaram as escolhas. O objetivo foi entregar uma solução funcional e alinhada com as premissas do desafio, mantendo a simplicidade como um pilar fundamental.
 
 ### **1. Abordagem aos Requisitos Funcionais**
 
@@ -63,4 +63,4 @@ Durante o desenvolvimento, identifiquei algumas áreas que representam oportunid
 
 ### **Conclusão**
 
-A solução apresentada para o desafio técnico da Vertical Logística reflete um esforço consciente para equilibrar a entrega de funcionalidades completas com a adesão aos princípios de simplicidade e clareza. Entende-se que a arquitetura modular, a escolha de tecnologias adequadas ao escopo e a abrangente suíte de testes demonstram uma base sólida para futuras expansões. As oportunidades de evolução mapeadas indicam um caminho claro para adaptar a aplicação a cenários mais complexos e exigentes, mantendo sempre a qualidade e a manutenibilidade como prioridades.
+A solução apresentada para o desafio técnico reflete um esforço consciente para equilibrar a entrega de funcionalidades completas com a adesão aos princípios de simplicidade e clareza. Entende-se que a arquitetura modular, a escolha de tecnologias adequadas ao escopo e a abrangente suíte de testes demonstram uma base sólida para futuras expansões. As oportunidades de evolução mapeadas indicam um caminho claro para adaptar a aplicação a cenários mais complexos e exigentes, mantendo sempre a qualidade e a manutenibilidade como prioridades.
