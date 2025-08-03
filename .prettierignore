@@ -1,0 +1,7 @@
+# Artefatos de build e dependências
+dist
+coverage
+node_modules
+
+# Arquivos de dados gerados ou de exemplo
+data/*.json
