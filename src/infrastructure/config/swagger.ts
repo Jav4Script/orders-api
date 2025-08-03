@@ -4,7 +4,7 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Challenge API',
+      title: 'Orders API',
       version: '1.0.0',
       description: 'API para processamento e consulta de pedidos',
     },

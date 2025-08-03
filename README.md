@@ -58,7 +58,11 @@ Ao longo do desenvolvimento, a **simplicidade** e a **lógica** foram priorizada
 
 ## Arquitetura
 
-A aplicação segue uma arquitetura em camadas, separando as responsabilidades de rota, controle e serviço, o que facilita a manutenção e o teste.
+A aplicação segue uma arquitetura limpa, dividida em três camadas principais:
+
+- **Application:** Orquestra o fluxo de dados entre o `domain` e a `infrastructure`. Contém os `usecases` da aplicação.
+- **Domain:** Contém a lógica de negócio principal, entidades e interfaces de repositório. É o coração da aplicação e não depende de nenhuma outra camada.
+- **Infrastructure:** Contém as implementações concretas de serviços externos, como banco de dados, parsers de arquivo e o servidor web.
 
 ### Diagrama de Fluxo de Dados
 
@@ -66,28 +70,28 @@ A aplicação segue uma arquitetura em camadas, separando as responsabilidades d
 sequenceDiagram
     participant Cliente
     participant API_Gateway as API (Express)
-    participant ValidationMiddleware as Middleware de Validação
     participant Controller
-    participant ParserService as Serviço de Parsing
-    participant OrderService as Serviço de Pedidos
-    participant DatabaseService as Serviço de Banco de Dados (SQLite)
+    participant OrderUseCase as Use Case de Pedidos
+    participant FileParser as Serviço de Parsing
+    participant OrderRepository as Repositório de Pedidos
 
     Cliente->>+API_Gateway: POST /api/import com arquivo .txt
     API_Gateway->>+Controller: uploadFile(req, res)
-    Controller->>+ParserService: parseAndNormalize(fileContent)
-    ParserService-->>-Controller: Retorna dados normalizados
-    Controller->>+DatabaseService: saveParsedData(normalizedData)
-    DatabaseService-->>-Controller: Confirmação
+    Controller->>+FileParser: parseAndNormalize(fileContent)
+    FileParser-->>-Controller: Retorna dados normalizados
+    Controller->>+OrderUseCase: saveOrders(normalizedData)
+    OrderUseCase->>+OrderRepository: save(orders)
+    OrderRepository-->>-OrderUseCase: Confirmação
+    OrderUseCase-->>-Controller: Confirmação
     Controller-->>-API_Gateway: Resposta 201 Created
     API_Gateway-->>-Cliente: Sucesso
 
     Cliente->>+API_Gateway: GET /api/orders?orderId=123
-    API_Gateway->>+ValidationMiddleware: Valida query params
-    ValidationMiddleware->>+Controller: getOrders(req, res)
-    Controller->>+OrderService: getFormattedOrders(filters)
-    OrderService->>+DatabaseService: findOrdersByFilter(filters)
-    DatabaseService-->>+OrderService: Retorna dados planos
-    OrderService-->>-Controller: Retorna dados formatados
+    API_Gateway->>+Controller: getOrders(req, res)
+    Controller->>+OrderUseCase: getFormattedOrders(filters)
+    OrderUseCase->>+OrderRepository: findOrdersByFilter(filters)
+    OrderRepository-->>+OrderUseCase: Retorna dados planos
+    OrderUseCase-->>-Controller: Retorna dados formatados
     Controller-->>-API_Gateway: Retorna dados JSON
     API_Gateway-->>-Cliente: Resposta 200 OK com JSON
 ```
@@ -105,14 +109,16 @@ graph TD
         B[Rotas da API]
         VM[Middleware de Validação]
         C1[Controller de Pedidos]
-        D[Serviço de Parsing]
-        DB[Serviço de Banco de Dados - SQLite]
+        OUC[Use Case de Pedidos]
+        FP[Serviço de Parsing]
+        OR[Repositório de Pedidos]
 
         A --> B
         B --> VM
         VM --> C1
-        C1 --> D
-        C1 --> DB
+        C1 --> OUC
+        OUC --> FP
+        OUC --> OR
     end
 
     C --> A
@@ -125,46 +131,71 @@ Abaixo está a estrutura de diretórios do projeto, com uma breve descrição de
 ```
 .
 ├───src/
-│   ├───server.ts             # Ponto de entrada da aplicação, configura o servidor Express.
-│   ├───api/                  # Contém a lógica da API REST.
-│   │   ├───controller.ts     # Lógica de negócio para manipular requisições e respostas.
-│   │   ├───routes.ts         # Define as rotas da API e associa aos controladores.
-│   │   ├───middlewares/      # Middlewares para processamento de requisições (ex: validação, tratamento de erros).
-│   │   │   ├───error.middleware.ts   # Middleware para tratamento centralizado de erros.
-│   │   │   └───validate.middleware.ts # Middleware para validação de schemas de requisição.
-│   │   └───schemas/          # Definições de schemas de validação (usando Zod).
-│   │       └───order.schema.ts       # Schema para validação de dados de pedidos.
-│   ├───application/          # Contém a lógica de negócio principal e serviços de aplicação.
-│   │   └───orderService.ts   # Serviço responsável pela manipulação e formatação de dados de pedidos.
-│   ├───config/               # Arquivos de configuração da aplicação.
-│   │   └───logger.ts         # Configuração do logger (Winston).
-│   └───services/             # Serviços de infraestrutura e utilitários.
-│       ├───database.ts       # Serviço para interação com o banco de dados (SQLite).
-│       └───parser.ts         # Serviço para parsing e normalização de arquivos de entrada.
-├───tests/                    # Contém os testes unitários e de integração.
-│   ├───api.spec.ts           # Testes para os endpoints da API.
-│   ├───parser.spec.ts        # Testes para o serviço de parsing.
-│   └───orderService.spec.ts  # Testes para o serviço de pedidos (orderService).
-├───data/                     # Exemplos de arquivos de entrada para importação.
-├───docs/                     # Documentação adicional e ativos (imagens).
-│   └───assets/               # Imagens usadas na documentação.
-├───.gitignore                # Arquivo para ignorar arquivos e diretórios no Git.
-├───ANALYSIS.md               # Análise e considerações sobre o desafio técnico.
-├───jest.config.js            # Configuração do Jest para testes.
-├───package.json              # Metadados do projeto e dependências.
-├───package-lock.json         # Bloqueio de versões das dependências.
-├───README.md                 # Este arquivo de documentação do projeto.
-└───tsconfig.json             # Configuração do TypeScript.
+│   ├───server.ts                           # Ponto de entrada da aplicação, configura o servidor Express.
+│   ├───api/                                # Camada de API: Responsável por expor os endpoints REST, lidar com requisições HTTP, validação de entrada e serialização de respostas.
+│   │   ├───controllers/                    # Contém os controladores da API.
+│   │   │   └───order.controller.ts         # Controller para manipular requisições e respostas de pedidos.
+│   │   ├───routes.ts                       # Define as rotas da API e associa aos controladores.
+│   │   ├───middlewares/                    # Middlewares para processamento de requisições (ex: validação, tratamento de erros).
+│   │   │   ├───error.middleware.ts         # Middleware para tratamento centralizado de erros.
+│   │   │   └───validate.middleware.ts      # Middleware para validação de schemas de requisição.
+│   │   └───schemas/                        # Definições de schemas de validação (usando Zod).
+│   │       └───order.schema.ts             # Schema para validação de dados de pedidos.
+│   ├───application/                        # Contém a lógica de negócio principal e serviços de aplicação.
+│   │   └───usecases/
+│   │       └───order.usecase.ts            # Use case responsável pela manipulação e formatação de dados de pedidos.
+│   ├───domain/                             # Contém as entidades, interfaces de repositório e contratos de serviços de domínio.
+│   │   ├───entities/
+│   │   │   └───order.entities.ts           # Define as entidades e tipos de dados do domínio de pedidos.
+│   │   ├───repositories/
+│   │   │   └───IOrderRepository.ts         # Interface que define o contrato para o repositório de pedidos.
+│   │   └───services/
+│   │       └───IFileParser.ts              # Interface que define o contrato para o serviço de parsing de arquivos.
+│   └───infrastructure/                     # Contém as implementações concretas de serviços externos.
+│       ├───config/
+│       │   └───logger.ts                   # Configuração do logger (Winston) para a aplicação.
+│       ├───database/
+│       │   ├───database.ts                 # Configuração e inicialização da conexão com o banco de dados (SQLite).
+│       │   └───order.repository.ts         # Implementação concreta do repositório de pedidos, interagindo com o SQLite.
+│       └───services/
+│           └───file-parser.service.ts      # Implementação concreta do serviço de parsing de arquivos.
+├───tests/                                  # Contém os testes unitários e de integração.
+│   ├───api/
+│   │   ├───api.spec.ts                     # Testes para os endpoints da API.
+│   │   └───middlewares/
+│   │       ├───error.middleware.spec.ts    # Testes para o middleware de tratamento de erros.
+│   │       └───validate.middleware.spec.ts # Testes para o middleware de validação.
+│   ├───application/
+│   │   └───order.usecase.spec.ts           # Testes para o use case de pedidos.
+│   └───infrastructure/
+│       └───parsers/
+│           └───file.parser.spec.ts         # Testes para o serviço de parsing de arquivos.
+├───.eslintrc.json                          # Configuração do ESLint para análise de código.
+├───.prettierrc.js                          # Configuração do Prettier para formatação de código.
+├───.prettierignore                         # Arquivos e diretórios a serem ignorados pelo Prettier.
+├───data/                                   # Exemplos de arquivos de entrada para importação.
+├───docs/                                   # Documentação adicional e ativos (imagens).
+│   └───assets/                             # Imagens usadas na documentação.
+├───.gitignore                              # Arquivo para ignorar arquivos e diretórios no Git.
+├───ANALYSIS.md                             # Análise e considerações sobre o desafio técnico.
+├───jest.config.js                          # Configuração do Jest para testes.
+├───package.json                            # Metadados do projeto e dependências.
+├───package-lock.json                       # Bloqueio de versões das dependências.
+├───README.md                               # Este arquivo de documentação do projeto.
+└───tsconfig.json                           # Configuração do TypeScript.
 ```
 
 ## Como Executar
 
-1.  **Instale as dependências:**
+1.  **Configure as variáveis de ambiente:**
+    Crie um arquivo `.env` na raiz do projeto, utilizando o `.env.example` como referência.
+
+2.  **Instale as dependências:**
     ```bash
     npm install
     ```
 
-2.  **Inicie o servidor:**
+3.  **Inicie o servidor:**
     ```bash
     npm start
     ```
@@ -184,6 +215,8 @@ Para gerar um relatório de cobertura de testes, execute:
 npm run test:coverage
 ```
 
+Após a execução dos testes, um relatório detalhado de cobertura será gerado, indicando a porcentagem de código coberto por testes unitários e de integração.
+
 ## Comandos Disponíveis
 
 Para facilitar o desenvolvimento e a execução do projeto, os seguintes comandos estão disponíveis via `npm`:
@@ -196,9 +229,15 @@ Para facilitar o desenvolvimento e a execução do projeto, os seguintes comando
 
 ## Endpoints da API
 
+### Documentação Interativa (Swagger)
+
+Para uma visualização interativa e detalhada de todos os endpoints, schemas e parâmetros, acesse a documentação do Swagger enquanto o servidor estiver em execução:
+
+[http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
 ### 1. Importar Arquivo
 
-- **URL:** `/api/import`
+- **URL:** `/api/orders`
 - **Método:** `POST`
 - **Formato:** `multipart/form-data`
 - **Campo do arquivo:** `file`
@@ -207,12 +246,8 @@ Para facilitar o desenvolvimento e a execução do projeto, os seguintes comando
 
 ```bash
 # Substitua pelo caminho do seu arquivo
-curl -X POST -F "file=@data/data_1.txt" http://localhost:3000/api/import
+curl -X POST -F "file=@data/data_1.txt" http://localhost:3000/api/orders
 ```
-
-**Resultado da Execução:**
-
-![Resultado do POST /api/import](docs/assets/post-import-result.png)
 
 ### 2. Consultar Pedidos
 
@@ -220,9 +255,9 @@ curl -X POST -F "file=@data/data_1.txt" http://localhost:3000/api/import
 - **Método:** `GET`
 - **Query Params (Opcionais):**
     - `orderId` (number): Filtra por um ID de pedido específico.
+    - `productId` (number): Filtra por um ID de produto específico.
     - `startDate` (string - `YYYY-MM-DD`): Data de início do intervalo de filtro.
     - `endDate` (string - `YYYY-MM-DD`): Data de fim do intervalo de filtro.
-    - `productId` (number): Filtra por um ID de produto específico.
     - `sortBy` (string - `order_id`, `total`, `date`): Ordena os resultados pelo campo especificado.
     - `sortOrder` (string - `asc`, `desc`): Ordena os resultados em ordem ascendente ou descendente.
 
@@ -232,10 +267,6 @@ curl -X POST -F "file=@data/data_1.txt" http://localhost:3000/api/import
   ```bash
   curl http://localhost:3000/api/orders
   ```
-
-**Resultado da Execução:**
-
-![Resultado do GET /api/orders](docs/assets/get-orders-result.png)
 
 - **Buscar pelo ID do pedido:**
   ```bash

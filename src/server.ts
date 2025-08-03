@@ -1,21 +1,26 @@
-import express from 'express';
-import apiRoutes from './api/routes';
-import { initializeDatabase } from './services/database';
-import { errorMiddleware } from './api/middlewares/error.middleware';
-import logger from './config/logger';
+import dotenv from 'dotenv';
 
-const app = express();
-const port = 3000;
+import { createApp } from './app';
+import logger from './infrastructure/config/logger';
+import { initializeDatabase } from './infrastructure/database/database';
+import { SqliteOrderRepository } from './infrastructure/database/order.repository';
+import { OrderUseCase } from './application/usecases/order.usecase';
 
-app.use(express.json());
-app.use('/api', apiRoutes);
-app.use(errorMiddleware);
+dotenv.config();
 
 const startServer = async () => {
   try {
     await initializeDatabase();
-    app.listen(port, () => {
-      logger.info(`Server is running on http://localhost:${port}`);
+
+    const orderRepository = new SqliteOrderRepository();
+    const orderUseCase = new OrderUseCase(orderRepository);
+
+    const app = createApp(orderUseCase);
+    const PORT = process.env.PORT || 3000;
+
+    app.listen(PORT, () => {
+      logger.info(`Server is running on http://localhost:${PORT}`);
+      logger.info(`API documentation available at http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
@@ -24,5 +29,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-export default app;
