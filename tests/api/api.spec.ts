@@ -14,7 +14,7 @@ describe('Order API Integration Tests', () => {
     db = await initializeDatabase(':memory:');
     const orderRepository = new SqliteOrderRepository(db);
     const orderUseCase = new OrderUseCase(orderRepository);
-    app = createApp(orderUseCase);
+    app = createApp(orderUseCase, db);
   });
 
   afterEach(async () => {
