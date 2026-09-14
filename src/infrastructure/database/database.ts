@@ -79,8 +79,8 @@ export async function clearDatabase(dbInstance: Database) {
 }
 
 // Saves the normalized user data into the database.
-export async function saveParsedData(users: User[]) {
-  const currentDb = await getDbConnection();
+export async function saveParsedData(users: User[], dbInstance?: Database) {
+  const currentDb = dbInstance || (await getDbConnection());
   await currentDb.run('BEGIN TRANSACTION');
   try {
     for (const user of users) {
