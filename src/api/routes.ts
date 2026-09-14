@@ -5,11 +5,12 @@ import { createOrderController } from '@/api/controllers/order.controller';
 import { validate } from '@/api/middlewares/validate.middleware';
 import { getOrdersSchema } from '@/api/schemas/order.schema';
 import { OrderUseCase } from '@/application/usecases/order.usecase';
+import { Database } from 'sqlite';
 
-export const createRouter = (orderUseCase: OrderUseCase) => {
+export const createRouter = (orderUseCase: OrderUseCase, db?: Database) => {
   const router = Router();
   const upload = multer({ storage: multer.memoryStorage() });
-  const { uploadFile, getOrders } = createOrderController(orderUseCase);
+  const { uploadFile, getOrders } = createOrderController(orderUseCase, db);
 
   /**
    * @swagger

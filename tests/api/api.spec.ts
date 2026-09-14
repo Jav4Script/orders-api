@@ -12,9 +12,9 @@ let app: any;
 describe('Order API Integration Tests', () => {
   beforeAll(async () => {
     db = await initializeDatabase(':memory:');
-    const orderRepository = new SqliteOrderRepository();
+    const orderRepository = new SqliteOrderRepository(db);
     const orderUseCase = new OrderUseCase(orderRepository);
-    app = createApp(orderUseCase);
+    app = createApp(orderUseCase, db);
   });
 
   afterEach(async () => {
@@ -42,7 +42,6 @@ describe('Order API Integration Tests', () => {
   });
 
   it('should return a list of orders', async () => {
-    // First, upload a file to populate the database
     const filePath = './tests/mocks/data_1.txt';
     await request(app).post('/api/orders').attach('file', filePath);
 
@@ -51,7 +50,6 @@ describe('Order API Integration Tests', () => {
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body.length).toBeGreaterThan(0);
-    // Add more specific assertions about the structure of the returned orders if needed
     expect(response.body[0]).toHaveProperty('user_id');
     expect(response.body[0]).toHaveProperty('name');
     expect(response.body[0]).toHaveProperty('orders');
@@ -105,7 +103,6 @@ describe('Order API Integration Tests', () => {
     expect(response.status).toBe(200);
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body.length).toBeGreaterThan(0);
-    // Add assertion to check if the orders are actually sorted by total in descending order
     const firstOrderTotal = parseFloat(response.body[0].orders[0].total);
     const secondOrderTotal = parseFloat(response.body[0].orders[1].total);
     expect(firstOrderTotal).toBeGreaterThanOrEqual(secondOrderTotal);
