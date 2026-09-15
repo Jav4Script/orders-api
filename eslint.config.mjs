@@ -37,7 +37,6 @@ export default [
   {
     ignores: ['node_modules/**', 'dist/**'],
   },
-  js.configs.recommended,
   {
     files: ['src/**/*.ts', 'tests/**/*.ts'],
     languageOptions: {
@@ -52,6 +51,7 @@ export default [
       prettier: prettierPlugin,
     },
     rules: {
+      ...js.configs.recommended.rules,
       ...tsPlugin.configs.recommended.rules,
       'prettier/prettier': 'error',
       '@typescript-eslint/no-unused-vars': [
