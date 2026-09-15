@@ -6,7 +6,7 @@ on:
       - chore/align-typescript-eslint-8
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   refresh:
@@ -20,8 +20,14 @@ jobs:
           node-version: 22
       - name: Refresh lockfile
         run: npm install --package-lock-only --ignore-scripts
-      - name: Upload lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: refreshed-package-lock
-          path: package-lock.json
+      - name: Commit lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "Lockfile already up to date"
+            exit 0
+          fi
+          git commit -m "chore(deps): refresh package-lock for typescript-eslint 8"
+          git push origin HEAD:chore/align-typescript-eslint-8
