@@ -1,4 +1,3 @@
-import js from '@eslint/js'
 import tsPlugin from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
 import prettierPlugin from 'eslint-plugin-prettier'
@@ -51,7 +50,6 @@ export default [
       prettier: prettierPlugin,
     },
     rules: {
-      ...js.configs.recommended.rules,
       ...tsPlugin.configs.recommended.rules,
       'prettier/prettier': 'error',
       '@typescript-eslint/no-unused-vars': [
